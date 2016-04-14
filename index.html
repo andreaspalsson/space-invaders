@@ -42,6 +42,7 @@ function AABBIntersect(ax, ay, aw, ah, bx, by, bw, bh){
 		this.canvas.height = this.height = height;
 
 		this.context = this.canvas.getContext("2d");
+		this.context.font = '15px Courier';
 
 		document.body.appendChild(this.canvas);
 	}
@@ -80,7 +81,7 @@ function AABBIntersect(ax, ay, aw, ah, bx, by, bw, bh){
 		document.addEventListener("keyup", function (event) {
 			delete _this.down[event.keyCode];
 			delete _this.pressed[event.keyCode];
-		})
+		});
 	}
 
 	InputHandler.prototype.isDown = function(keyCode) {
@@ -120,7 +121,9 @@ function AABBIntersect(ax, ay, aw, ah, bx, by, bw, bh){
 			init();
 			run();
 		});
-		img.src = "res/invaders.png";
+
+		//img.src = "res/invaders.png";
+		img.src = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAHgAAAAgCAMAAADuZ0x6AAADAFBMVEUAAABsfjZUwM70Pmb1oCkAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABpp9XlAAABAHRSTlP///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////8AU/cHJQAAANRJREFUeNrV1kEOgyAQQNEOeP8rT0WafmQENC4YflLAbl7SUPCjeyForlpve3oq/lKTiD5qJgxnWeh4Ucmm1oHDKVjo2GhNOGMhMGe2HGGY80pM3uFw2VYVG8Fd01LlA7abK33Kn7o8PphTPVga+YD1X37OGEcJHGMflk5zYT3irwTGCqist7lk0Ez4/bVo8w0nCI6nO9fic5bmwvYAuX8tjmG+9QGDlfP4WhzBsOQCfnUtjmGt8gCztezrHmMKitWCcOPItC8CoMyrwrDQgJZmvST8BSi+SXrTUvXiAAAAAElFTkSuQmCC";
 	}
 
 	function init(){
@@ -128,6 +131,7 @@ function AABBIntersect(ax, ay, aw, ah, bx, by, bw, bh){
 		spriteFrame = 0;
 		levelFrame = 60;
 		direction = 1;
+		score = 0;
 
 		tank =  {
 			sprite: tankSprite,
@@ -152,7 +156,7 @@ function AABBIntersect(ax, ay, aw, ah, bx, by, bw, bh){
 				this.context = this.canvas.getContext("2d");
 
 				for(var i = 0; i < 4; i++){
-					this.context.drawImage(citySprite.img, citySprite.x, citySprite.y, citySprite.w, citySprite.h, 68 + 111*i, 0 ,citySprite.w, citySprite.h)
+					this.context.drawImage(citySprite.img, citySprite.x, citySprite.y, citySprite.w, citySprite.h, 68 + 111*i, 0 ,citySprite.w, citySprite.h);
 				}
 			},
 			generateDamage : function(x, y){
@@ -184,15 +188,18 @@ function AABBIntersect(ax, ay, aw, ah, bx, by, bw, bh){
 
 		aliens = [];
 		var row = [1, 0, 0, 2,2];
+		var scores = [5,10,1];
+		
 		for (var i = 0, length = row.length; i < length; i++) {
 			for (var j = 0; j < 10; j++) {				
-				var alienIndex= row[i]
+				var alienIndex= row[i];
 				aliens.push({
 					sprite: alienSprite[alienIndex],
 					x: 30 + j*30 + [0, 4, 0][alienIndex],
 					y: 30 + i*30,
 					w: alienSprite[alienIndex][0].w,
-					h: alienSprite[alienIndex][0].h
+					h: alienSprite[alienIndex][0].h,
+					score: scores[alienIndex]
 				});
 			}
 		}
@@ -208,7 +215,7 @@ function AABBIntersect(ax, ay, aw, ah, bx, by, bw, bh){
 			}else{
 				render();
 			}
-		}
+		};
 
 		window.requestAnimationFrame(loop, display.canvas);
 
@@ -256,6 +263,7 @@ function AABBIntersect(ax, ay, aw, ah, bx, by, bw, bh){
 					if(AABBIntersect(bullet.x, bullet.y, bullet.width, bullet.height, alien.x, alien.y, alien.w, alien.h)){
 						
 						console.log("Alien hit");
+						score += alien.score;
 						//Remove alien
 						aliens.splice(j, 1);
 						j--;
@@ -347,11 +355,20 @@ function AABBIntersect(ax, ay, aw, ah, bx, by, bw, bh){
 		display.context.restore();
 
 		display.context.drawImage(cities.canvas, 0, cities.y);
+
+
+
 		if(!gameOver){
 			display.drawSprite(tank.sprite, tank.x, tank.y);
 		}else{
 			//Show end screen
+			display.context.fillStyle="#FFF";
+			display.context.fillText("Game Over", 50,50);
 		}
+
+		display.context.fillStyle="#FFF";
+		display.context.fillText("Score: " + score, 30,20);
+
 	}
 
 	main();
